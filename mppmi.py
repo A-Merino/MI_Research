@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
 def colorPPMI(image1, image2):
     '''
         Function which calculates the Paired-Pixel Mutual Information (PPMI)
@@ -36,10 +35,10 @@ def colorPPMI(image1, image2):
                 # Round the pixel intensity to get pmf value
                 r = float(np.round(pixel, 2))
                 # Run the PPMI sum
-                pixels(pixel, pmf[r], Ypmf, jj[r], image2)
+                pixels(pmf[r], Ypmf, jj[r], image2)
 
 
-def pixels(pixel, prob, pmf, joint, image):
+def pixels(prob, pmf, joint, image):
 
     # Initialize the sum
     total = 0
@@ -62,7 +61,7 @@ def pixels(pixel, prob, pmf, joint, image):
     print(total)
 
 
-def calcMI(pxy, px, py):
+def calcMI(pxy: float, px: float, py: float) -> float:
     '''
         Calculates the mutual information between
         two variables x and y
@@ -99,10 +98,15 @@ def imagePMF(image):
         Function which calculates the pmf of each color
         channel in an image
 
-        Parameters:
-            - image: The intensity values of the image
+        Parameters
+        ----------
 
-        Output:
+        image : array_like
+            The intensity values of the image
+
+        Returns
+        -------
+        rgb : List of dictionaries
             A list of dictionaries which hold the marginal
             pmf of a channel of the input image.
 
@@ -193,14 +197,4 @@ def jointPMF(image1, image2):
         rgb.append(x_probs)
 
     return rgb
-
-
-im3 = np.random.rand(3, 700, 700)
-# imagePMF(im3)
-im4 = np.random.rand(3, 700, 700)
-
-colorPPMI(im3, im4)
-
-
-
 
