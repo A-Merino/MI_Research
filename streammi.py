@@ -10,12 +10,15 @@ def streammi(stream1, stream2):
     ''' 
 
     # Change range of values to 0 to 1 in maps
-    stream1 = torch.div(stream1, torch.max(stream1))
-    stream2 = torch.div(stream2, torch.max(stream2))
+    if torch.max(stream1) != 0:
+        stream1 = torch.div(stream1, torch.max(stream1))
+    if torch.max(stream2) != 0:
+        stream2 = torch.div(stream2, torch.max(stream2))
 
     # Calculate the marginal PMFs of each image
     Xpmf = linePMF(stream1)
     Ypmf = linePMF(stream2)
+
 
     # Calculate the joint PMF of the images
     joint = jointPMF(stream1, stream2, (list(Xpmf.keys()), list(Ypmf.keys())))
@@ -146,7 +149,6 @@ def jointPMF(s1, s2, bins):
     # This will give us a dictionary of y probabilities
     x_probs = {}
     allPoints = sum(sum(histo[0]))
-
 
     # Go through each bin from histogram indexed by x probabilities
     for edge, row in zip(bins[0], histo[0]):
