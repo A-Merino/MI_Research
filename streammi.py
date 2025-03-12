@@ -16,47 +16,23 @@ def streammi(stream1, stream2):
     # Calculate the marginal PMFs of each image
     Xpmf = linePMF(stream1)
     Ypmf = linePMF(stream2)
+
     # Calculate the joint PMF of the images
-    joint = jointPMF(map1, map2, (list(Xpmf.keys()), list(Ypmf.keys())))
+    joint = jointPMF(stream1, stream2, (list(Xpmf.keys()), list(Ypmf.keys())))
 
-    outtie = []
-    prev_MI = {}
+    mi = 0
     # Go through each pixel in each row of feature map
-    for row in map1:
-        that = []
-        for pixel in row:
-
-            # Round the pixel intensity to get pmf value
-            r = np.round(np.float32(pixel), 2)
-
-            # Get probability of pixel happening in map1
-            # Send pmf of map2
-            # Send joint of map1 and map2 at value of map1
-            # Send map2
-            if r in prev_MI.keys():
-                that.append(prev_MI[r])
-            else:
-                mi = pixels(Xpmf[r], Ypmf, joint[r], map2)
-                prev_MI[r] = mi
-                that.append(mi)
-
-        outtie.append(that)
-    return outtie
+    for p1, p2 in zip(stream1, stream2):
 
 
-def pixels(prob, pmf, joint, fm):
+        # Round the pixel intensities to get pmf value
+        r1 = float(torch.round(p1, decimals=2))
+        r2 = float(torch.round(p2, decimals=2))
 
-    # Initialize the sum
-    total = 0
-    # Go through each pixel in feature map
-    for row in fm:
-        for pixel in row:
-            # Get rounded values to recieve pmf
-            r = np.round(np.float32(pixel), 2)
-            # Add MI to total
-            total += calcMI(joint[r], prob, pmf[r])
+        # Calculate mutual information between two pixels
+        mi += calcMI(joint[r1][r2], Xpmf[r1], Ypmf[r2]) 
 
-    return total
+    return float(mi)
 
 
 def calcMI(pxy: float, px: float, py: float) -> float:
@@ -130,7 +106,7 @@ def linePMF(fm):
     # and the pmf(x) as the value
     daPMF = {}
     for a, b in zip(val, pmf):
-        daPMF[a] = float(b)
+        daPMF[float(a)] = float(b)
 
     return daPMF
 
@@ -166,8 +142,7 @@ def jointPMF(s1, s2, bins):
     histo = np.histogram2d(fm1, fm2
         , bins=(x_bin, y_bin)  # bins set to 100 for rounding purposes
         )
-    plt.imshow(histo[0])
-    plt.show()
+
     # This will give us a dictionary of y probabilities
     x_probs = {}
     allPoints = sum(sum(histo[0]))
@@ -181,9 +156,9 @@ def jointPMF(s1, s2, bins):
         # y probability we are looking at
         for y_e, pixel in zip(bins[1], row):
             # Calculate P(X=x, Y=y)
-            y_probs[y_e] = float(pixel / allPoints)
+            y_probs[float(y_e)] = float(pixel / allPoints)
 
-        x_probs[edge] = y_probs
+        x_probs[float(edge)] = y_probs
 
     # joint pmf of feature maps is complete
     return x_probs
