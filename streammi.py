@@ -121,8 +121,10 @@ def jointPMF(s1, s2, bins):
 
         Parameters
         ----------
-            map1: The intensity values of a feature map
-            map2: The intensity values of a feature map
+            s1: The intensity values of a feature map
+            s2: The intensity values of a feature map
+            bins: the list of unique keys from s1 and s2
+
 
         Output:
             The joint pmf of the intensity values
@@ -143,7 +145,7 @@ def jointPMF(s1, s2, bins):
     fm2 = torch.round(s2, decimals=2)
 
     histo = np.histogram2d(fm1, fm2
-        , bins=(x_bin, y_bin)  # bins set to 100 for rounding purposes
+        , bins=(x_bin, y_bin)  # bins set to unique values to make joint work
         )
 
     # This will give us a dictionary of y probabilities
